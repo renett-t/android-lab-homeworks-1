@@ -12,12 +12,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         var mari = Student(12,  "mari@mail.ru", "Mari")
-        var jolyne = HappyStudent(42, "JoLiNe@ma.com","Jolyne")
+        var jolyne = HappyStudent(42, "JoLyNe@ma.com","Jolyne")
         var vanya = Student(13, "myemail@gmail.com", null)
         var teacherFerenets = Teacher("teachers@mail.ya", "Ferya")
         var listOfStudents = arrayListOf(mari, jolyne, vanya)
 
-        println("\n________________________ - uni life: start")
+        println("\n________________________ - uni life: start!")
 
         mari.study(5.3)
         jolyne.study(3.2)
@@ -26,14 +26,14 @@ class MainActivity : AppCompatActivity() {
             student.getState()
         }
 
-        println("\n________________________ - after watching anime")
+        println("\n________________________ - after watching anime:")
 
         jolyne.watchAnime()
         for (student in listOfStudents) {
             student.getState()
         }
 
-        println("\n________________________ - teacher held a lesson and checked hw")
+        println("\n________________________ - teacher held a lesson and checked hw:")
 
         teacherFerenets.teachAClass()
         teacherFerenets.checkStudentsHomeworks(listOfStudents)

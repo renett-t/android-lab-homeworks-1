@@ -14,15 +14,15 @@ open class User(var email: String) {
             else
                 "Anonymous"
         }
-//        set(value) {
-//            value?.let {
-//                if (it.length > 2) {
-//                    field = name
-//                } else {
-//                    field = null
-//                }
-//            }
-//        }
+        set(value) {
+            value?.let {
+                if (it.length > 2) {
+                    field = value
+                } else {
+                    field = null
+                }
+            }
+        }
 
     fun isPaidForSubscription(): Boolean {
         return isSubscribed

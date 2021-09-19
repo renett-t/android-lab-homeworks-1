@@ -1,6 +1,6 @@
 package ru.itis.renett.testapp.entities
 
-import java.lang.Math.max
+import kotlin.math.max
 import kotlin.random.Random
 
 class HappyStudent(studentId: Int, email: String, name: String?) : Student(studentId, email, name), HappyHumanInterface {
