@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">TestApp</string>
+    <string name="posts">Публикации</string>
+    <string name="subscribers">Подписчики</string>
+    <string name="subscribed">Подписки</string>
+    <string name="name">Regina Tiapkina ☀️</string>
+    <string name="bio">Just a little girl with big dreams \n. \n. \nKFU | Institute of Information Technology and Intelligent Systems</string>
+    <string name="website">t.me/renett_t</string>
+    <string name="username">renett_t</string>
+    <string name="add">Добавить</string>
+    <string name="edit">Редактировать профиль</string>
 </resources>
