@@ -23,7 +23,8 @@
         <activity android:name=".SecondActivity"
             android:exported="false">
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.SET_ALARM" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 

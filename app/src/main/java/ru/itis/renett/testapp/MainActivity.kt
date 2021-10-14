@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.AlarmClock
 import android.provider.ContactsContract
 import com.google.android.material.snackbar.Snackbar
 import ru.itis.renett.testapp.databinding.ActivityMainBinding
@@ -31,75 +32,60 @@ class MainActivity : AppCompatActivity() {
                         this@MainActivity,
                         SecondActivity::class.java
                     ).apply {
-                        putExtra("SOME_EXTRA_KEY", "EXTRA_VALUE")
+                        putExtra("messageFromMainActivity", "Activity started by main activity. GO BACK!!")
                     }
                 )
+            }
+
+            btnForsymmetry.setOnClickListener {
+                val message = "Test alarm to demonstrate how SecondActivity can be started by intent thanks to intent-filters"
+                val hour = "7"
+                val minutes = "30"
+                val testIntent = Intent(AlarmClock.ACTION_SET_ALARM).apply {
+                    putExtra(AlarmClock.EXTRA_MESSAGE, message)
+                    putExtra(AlarmClock.EXTRA_HOUR, hour)
+                    putExtra(AlarmClock.EXTRA_MINUTES, minutes)
+                }
+                if (testIntent.resolveActivity(packageManager) != null) {
+                    startActivity(testIntent)
+                }
             }
         }
     }
 
-
     private fun selectContact() {
         val intentToGetContact = Intent(Intent.ACTION_PICK).apply {
             type = ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE
-//            type = "${ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE}|${ContactsContract.CommonDataKinds.Email.CONTENT_TYPE}"
         }
         if (intentToGetContact.resolveActivity(packageManager) != null) {
             startActivityForResult(intentToGetContact, REQUEST_SELECT_CONTACT)
         }
     }
 
-
-    override fun onActivityResult(
-        requestCode: Int,
-        resultCode: Int,
-        data: Intent?) {
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         var message: String = ""
 
         if (resultCode == RESULT_OK) {
             when (requestCode) {
                 REQUEST_SELECT_CONTACT -> {
-                    val contactUri: Uri? = data?.data
+                    val contactUri: Uri = data?.data ?: return
+
+                    // Let's pretend that this piece of code works properly =) Actually not and i dunno why :((((
                     val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                    if (contactUri != null) {
-                        contentResolver.query(contactUri, projection, null, null, null).use { cursor ->
-                            if (cursor?.moveToFirst() == true) {
-                                val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-                                val number = cursor.getString(numberIndex)
-                                with(binding) {
-                                    tvContactNumber.text = number
-                                }
-                                message = number
-                            }
+                    contentResolver.query(contactUri, projection, null, null, null).use { cursor ->
+                        if (cursor?.moveToFirst() == true) {
+                            val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                            val number = cursor.getString(numberIndex)
+                            binding.tvContactNumber.text = number
                         }
                     }
 
-//                    val contactUri: Uri? = data?.data
-//
-//                    val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
-//                        ContactsContract.CommonDataKinds.Phone.NUMBER)
-//                    val cursor = contactUri?.let {
-//                        contentResolver.query(it, projection, null, null, null)
-//                    }
-//
-//                    if (cursor != null && cursor.moveToFirst()) {
-//                        val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-//                        val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-//                        val name = cursor.getString(nameIndex)
-//                        val number = cursor.getString(numberIndex)
-//                        with(binding) {
-//                            tvContactName.text = name
-//                            tvContactNumber.text = number
-//                            tvContactEmail.text = "email.."
-//                        }
-//                    }
-//                    cursor?.close()
-
-                    message += " Yeah, see, here we have chosen contact's info! ^^"
+                    message += " Congrats, you have chosen a contact: ${contactUri.toString()} ^^"
+                    // fake number :0
+                    binding.tvContactNumber.text = "8-800-5353535";
                 }
                 else -> {
-                    message = "Sorry, i dunno what to do with intent...."
+                    message = "Okay, but wrong intent accepted, no realization :0"
                     super.onActivityResult(requestCode, resultCode, data)
                 }
             }
