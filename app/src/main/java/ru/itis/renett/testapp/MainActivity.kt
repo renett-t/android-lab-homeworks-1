@@ -1,27 +1,16 @@
 package ru.itis.renett.testapp
 
-import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
-import android.provider.MediaStore
-import android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI
-import androidx.core.content.FileProvider
+import android.provider.ContactsContract
 import com.google.android.material.snackbar.Snackbar
 import ru.itis.renett.testapp.databinding.ActivityMainBinding
-import java.io.File
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
-const val REQUEST_IMAGE_CAPTURE = 1
+const val REQUEST_SELECT_CONTACT = 1
 
 class MainActivity : AppCompatActivity() {
-
-    lateinit var currentPhotoPath: String
 
     private lateinit var binding: ActivityMainBinding
 
@@ -32,64 +21,91 @@ class MainActivity : AppCompatActivity() {
         }
 
         with(binding) {
-            btnCameraIntent.setOnClickListener {
-                getPhotoFromCamera()
-            }
-        }
-    }
-
-    private fun getPhotoFromCamera() {
-        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-
-        if (takePictureIntent.resolveActivity(packageManager) != null) {
-            // creating a file where to save picture
-            val photoFile: File? = try {
-                createImageFile()
-            } catch (ex: IOException) {
-                Snackbar.make(
-                    binding.root,
-                    "Error occurred while creating the File",
-                    Snackbar.LENGTH_LONG
-                ).show()
-                null
+            btnSelectContactIntent.setOnClickListener {
+                selectContact()
             }
 
-            // if the file was created
-            photoFile?.also {
-                val photoURI: Uri = FileProvider.getUriForFile(
-                    this,
-                    "com.example.android.fileprovider",
-                    it
+            btnGoto2activity.setOnClickListener {
+                startActivity(
+                    Intent(
+                        this@MainActivity,
+                        SecondActivity::class.java
+                    ).apply {
+                        putExtra("SOME_EXTRA_KEY", "EXTRA_VALUE")
+                    }
                 )
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
             }
         }
     }
+
+
+    private fun selectContact() {
+        val intentToGetContact = Intent(Intent.ACTION_PICK).apply {
+            type = ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE
+//            type = "${ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE}|${ContactsContract.CommonDataKinds.Email.CONTENT_TYPE}"
+        }
+        if (intentToGetContact.resolveActivity(packageManager) != null) {
+            startActivityForResult(intentToGetContact, REQUEST_SELECT_CONTACT)
+        }
+    }
+
 
     override fun onActivityResult(
         requestCode: Int,
         resultCode: Int,
         data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
 
         var message: String = ""
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_IMAGE_CAPTURE -> {
-                    val imageBitmapThumbnail = data?.extras?.get("data") as Bitmap
 
-                    with(binding) {
-                        ivAvatar.setImageBitmap(imageBitmapThumbnail)
+        if (resultCode == RESULT_OK) {
+            when (requestCode) {
+                REQUEST_SELECT_CONTACT -> {
+                    val contactUri: Uri? = data?.data
+                    val projection: Array<String> = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                    if (contactUri != null) {
+                        contentResolver.query(contactUri, projection, null, null, null).use { cursor ->
+                            if (cursor?.moveToFirst() == true) {
+                                val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                                val number = cursor.getString(numberIndex)
+                                with(binding) {
+                                    tvContactNumber.text = number
+                                }
+                                message = number
+                            }
+                        }
                     }
-                    message = "The picture has been updated ^^"
+
+//                    val contactUri: Uri? = data?.data
+//
+//                    val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+//                        ContactsContract.CommonDataKinds.Phone.NUMBER)
+//                    val cursor = contactUri?.let {
+//                        contentResolver.query(it, projection, null, null, null)
+//                    }
+//
+//                    if (cursor != null && cursor.moveToFirst()) {
+//                        val nameIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+//                        val numberIndex = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+//                        val name = cursor.getString(nameIndex)
+//                        val number = cursor.getString(numberIndex)
+//                        with(binding) {
+//                            tvContactName.text = name
+//                            tvContactNumber.text = number
+//                            tvContactEmail.text = "email.."
+//                        }
+//                    }
+//                    cursor?.close()
+
+                    message += " Yeah, see, here we have chosen contact's info! ^^"
                 }
                 else -> {
-                    message = "Wrong intent call"
+                    message = "Sorry, i dunno what to do with intent...."
+                    super.onActivityResult(requestCode, resultCode, data)
                 }
             }
         } else {
-            message = "Picture wasn't set as your avatar. Try again!"
+            message = "Contact wasn't picked. Try again"
+            super.onActivityResult(requestCode, resultCode, data)
         }
 
         Snackbar.make(
@@ -97,21 +113,6 @@ class MainActivity : AppCompatActivity() {
             message,
             Snackbar.LENGTH_LONG
         ).show()
-    }
-
-    @Throws(IOException::class)
-    private fun createImageFile(): File {
-        // Create an image file name
-        val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "JPEG_${timeStamp}_", /* prefix */
-            ".jpg", /* suffix */
-            storageDir /* directory */
-        ).apply {
-            // Save a file: path for use with ACTION_VIEW intents
-            currentPhotoPath = absolutePath
-        }
     }
 
 }
