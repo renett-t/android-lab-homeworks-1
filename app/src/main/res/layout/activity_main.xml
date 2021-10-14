@@ -29,7 +29,7 @@
         />
 
     <Button
-        android:id="@+id/btn_forsymmetry"
+        android:id="@+id/btn_send_test_intent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="0"
@@ -39,6 +39,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="8dp"/>
 
+    <!--    button just for symmetry -->
     <Button
         android:id="@+id/btn_goto2activity"
         android:layout_width="wrap_content"
@@ -46,7 +47,7 @@
         android:text="0"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/btn_forsymmetry"
+        app:layout_constraintStart_toEndOf="@id/btn_send_test_intent"
         android:layout_marginEnd="8dp"/>
 
     <TextView

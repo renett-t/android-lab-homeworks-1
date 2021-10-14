@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            btnForsymmetry.setOnClickListener {
+            btnSendTestIntent.setOnClickListener {
                 val message = "Test alarm to demonstrate how SecondActivity can be started by intent thanks to intent-filters"
                 val hour = "7"
                 val minutes = "30"
