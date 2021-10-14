@@ -6,13 +6,83 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="200dp"
+        android:layout_height="320dp"
+        app:layout_constraintBottom_toTopOf="@id/btn_select_contact_intent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="32dp"
+        app:layout_constraintTop_toTopOf="parent"
+        android:src="@drawable/ic_avatar" />
+
+
+    <Button
+        android:id="@+id/btn_select_contact_intent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:text="Choose contact to display"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="100dp"
+        />
+
+    <Button
+        android:id="@+id/btn_send_test_intent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btn_goto2activity"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="8dp"/>
+
+    <!--    button just for symmetry -->
+    <Button
+        android:id="@+id/btn_goto2activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_send_test_intent"
+        android:layout_marginEnd="8dp"/>
+
+    <TextView
+        android:id="@+id/tv_contact_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textSize="22sp"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:layout_marginStart="24dp"
+        app:layout_constraintTop_toTopOf="@id/iv_avatar"
+        app:layout_constraintBottom_toTopOf="@id/tv_contact_number"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar"  />
+
+    <TextView
+        android:id="@+id/tv_contact_number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Number"
+        android:textSize="22sp"
+        android:layout_marginStart="24dp"
+        android:layout_marginVertical="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_contact_name"
+        app:layout_constraintBottom_toTopOf="@id/tv_contact_email"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar" />
+
+    <TextView
+        android:id="@+id/tv_contact_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Email"
+        android:textSize="22sp"
+        android:layout_marginStart="24dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_contact_number"
+        app:layout_constraintBottom_toBottomOf="@id/iv_avatar"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
