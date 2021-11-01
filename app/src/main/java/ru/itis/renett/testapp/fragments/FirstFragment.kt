@@ -18,6 +18,7 @@ class FirstFragment : Fragment(R.layout.fragment_first) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding = FragmentFirstBinding.bind(view)
         bookAdapter = AlbumAdapter(AlbumRepository.albumList) {
             showAlbumFragment(it)

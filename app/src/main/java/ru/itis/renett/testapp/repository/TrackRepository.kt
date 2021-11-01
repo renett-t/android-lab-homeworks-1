@@ -5,19 +5,24 @@ import ru.itis.renett.testapp.models.Track
 object TrackRepository {
     private var i = 0;
 
-    val tracks = arrayListOf<Track>(
+    val tracks = arrayListOf(
         Track(++i, "Когда ты откроешь глаза", "Три дня дождя", 1, 172),
         Track(++i, "Перезаряжай", "Три дня дождя",1, 190),
         Track(++i, "Вода", "Три дня дождя, MUKKA",1, 193),
         Track(++i, "Всё из-за тебя", "Три дня дождя",1, 170),
         Track(++i, "Отражения", "Три дня дождя, SHENA?", 1, 183),
-        Track(++i, "В кого ты влюблена", "Три дня дождя",1, 182), // and many more songs in this album i'm just being lazy
+        Track(++i, "В кого ты влюблена", "Три дня дождя",1, 182),
+        Track(++i, "Стекло", "Три дня дождя",1, 193),
+        Track(++i, "Театр Теней", "Три дня дождя",1, 166),
+        Track(++i, "Космос", "Три дня дождя, Лали",1, 211),
+        Track(++i, "Где ты", "Три дня дождя", 1, 142),
+        Track(++i, "Если я умру", "Три дня дождя",1, 191),
         Track(++i, "I Was Made For Lovin' You", "KISS",2, 271),
         Track(++i, "2,000 Man", "KISS",2, 295),
         Track(++i, "Sure Know Something", "KISS", 2, 241),
         Track(++i, "Dirty Livin'", "KISS",  2, 267),
         Track(++i, "Charisma", "KISS",  2, 265),
-        Track(++i, "Magic Touch", "KISS",  2, 282),
+        Track(++i, "Magic Touch", "KISS",  2, 282), // and many more songs in this album i'm just being lazy
         Track(++i, "Good Day", "Twenty One Pilots", 3, 204),
         Track(++i, "Choker", "Twenty One Pilots", 3, 223),
         Track(++i, "Shy Away", "Twenty One Pilots", 3, 175),
@@ -41,8 +46,8 @@ object TrackRepository {
         Track(++i, "Under The Table", "Fiona Apple",  6, 201),
         Track(++i, "Relay", "Fiona Apple",  6, 289),
         Track(++i, "Rack of His", "Fiona Apple",  6, 242),
+    )
 
-        )
     fun getAlbumTracks(albumId: Int): List<Track> {
         val list: ArrayList<Track> = arrayListOf();
         for (tr in tracks) {
@@ -50,5 +55,16 @@ object TrackRepository {
                 list.add(tr)
         }
         return list;
+    }
+
+    fun getTrackById(id: Int) : Track? {
+        for (j in tracks)
+            if (j.id == id)
+                return j
+        return null
+    }
+
+    fun getTrackCoverByAlbumId(albumId: Int) : Int? {
+        return AlbumRepository.getAlbumById(albumId)?.coverUrl
     }
 }
