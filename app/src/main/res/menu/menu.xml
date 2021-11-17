@@ -8,10 +8,10 @@
         />
     <item
         android:id="@+id/secondFragment"
-        android:icon="@drawable/icon_list"
+        android:icon="@drawable/icon_music"
         android:title="List" />
     <item
         android:id="@+id/thirdFragment"
-        android:icon="@drawable/icon_cards"
+        android:icon="@drawable/icon_flower"
         android:title="Cards" />
 </menu>

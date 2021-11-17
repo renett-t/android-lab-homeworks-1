@@ -4,10 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
+import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.databinding.ItemTrackBinding
 import ru.itis.renett.testapp.models.Track
 import ru.itis.renett.testapp.repository.TrackRepository
-import java.util.*
 
 class TrackHolder (
     private val binding: ItemTrackBinding,
@@ -31,9 +32,10 @@ class TrackHolder (
                 ivItemTrackCover.setImageResource(it.coverUrl)
                 tvItemTrackArtist.text = it.artist
                 tvItemTrackTitle.text = it.title
-                val minutes = (it.duration % 3600) / 60
-                val seconds = it.duration % 60
-                tvItemTrackDuration.text = String.format(Locale.ENGLISH, "%02d:%02d", minutes, seconds)
+
+                ivDelete.setOnClickListener {
+                    println("trying to remove")
+                }
             }
         }
     }
