@@ -36,4 +36,8 @@ class TrackListAdapter (
         }
     }
 
+    override fun submitList(list: MutableList<Track>?) {
+        super.submitList(if (list == null) null else ArrayList(list))
+    }
+
 }

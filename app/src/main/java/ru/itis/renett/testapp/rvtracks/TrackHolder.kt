@@ -31,8 +31,8 @@ class TrackHolder (
                 ivItemTrackCover.setImageResource(it.coverUrl)
                 tvItemTrackArtist.text = it.artist
                 tvItemTrackTitle.text = it.title
-                val minutes = (it.duration % 3600) / 60;
-                val seconds = it.duration % 60;
+                val minutes = (it.duration % 3600) / 60
+                val seconds = it.duration % 60
                 tvItemTrackDuration.text = String.format(Locale.ENGLISH, "%02d:%02d", minutes, seconds)
             }
         }

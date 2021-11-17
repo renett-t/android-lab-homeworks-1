@@ -6,7 +6,7 @@ import ru.itis.renett.testapp.models.Track
 object TrackRepository {
     private var i = 0;
 
-    val tracks = arrayListOf(
+    var tracks = arrayListOf(
         Track(++i, "Когда ты откроешь глаза", "Три дня дождя", R.drawable.cover1, 172),
         Track(++i, "Перезаряжай", "Три дня дождя", R.drawable.cover1, 190),
         Track(++i, "Вода", "Три дня дождя, MUKKA", R.drawable.cover1, 193),
@@ -56,4 +56,15 @@ object TrackRepository {
         return null
     }
 
+    fun getSize() = i;
+
+    fun addNewTrack(track: Track) {
+        track.id = ++i;
+        tracks.add(track);
+    }
+
+    fun addNewTrack(index: Int, track: Track) {
+        track.id = index;
+        tracks.add(index - 1, track);   // у меня индексы трэков начинаются с единички :0
+    }
 }
