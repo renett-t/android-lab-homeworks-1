@@ -77,7 +77,7 @@ class SecondFragment : Fragment(R.layout.fragment_second) {
             val newTrack = Track(
                 0, title,
                 dialogLayout.findViewById<EditText>(R.id.et_artists).text.toString(),
-                R.drawable.cover6,
+                R.drawable.cover3,
                 188
             )
             val index =

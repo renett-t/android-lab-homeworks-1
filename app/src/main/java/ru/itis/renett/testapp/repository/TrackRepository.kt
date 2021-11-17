@@ -56,15 +56,15 @@ object TrackRepository {
         return null
     }
 
-    fun getSize() = i;
+    fun getSize() = tracks.size;
 
     fun addNewTrack(track: Track) {
-        track.id = ++i;
-        tracks.add(track);
+        track.id = ++i
+        tracks.add(track)
     }
 
     fun addNewTrack(index: Int, track: Track) {
-        track.id = index;
+        track.id = ++i
         tracks.add(index - 1, track);   // у меня индексы трэков начинаются с единички :0
     }
 
