@@ -4,15 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
-import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.databinding.ItemTrackBinding
 import ru.itis.renett.testapp.models.Track
 import ru.itis.renett.testapp.repository.TrackRepository
 
 class TrackHolder (
     private val binding: ItemTrackBinding,
-    private val onItemChosenAction: (Int) -> Unit
+    private val onItemChosenAction: (Int) -> Unit,
+    private val onDeleteItemAction: (Int) -> Unit
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var trackToDisplay: Track? = null
@@ -34,7 +33,7 @@ class TrackHolder (
                 tvItemTrackTitle.text = it.title
 
                 ivDelete.setOnClickListener {
-                    println("trying to remove")
+                    onDeleteItemAction(itemId)
                 }
             }
         }
@@ -58,12 +57,13 @@ class TrackHolder (
     companion object {
         fun create (
             parent: ViewGroup,
-            onItemChosenAction: (Int) -> Unit
+            onItemChosenAction: (Int) -> Unit,
+            onDeleteItemAction: (Int) -> Unit
         ) = TrackHolder (
             ItemTrackBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false),
-            onItemChosenAction)
+            onItemChosenAction, onDeleteItemAction)
     }
 }

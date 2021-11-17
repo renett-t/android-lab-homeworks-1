@@ -25,9 +25,7 @@ class SecondFragment : Fragment(R.layout.fragment_second) {
 
         binding = FragmentSecondBinding.bind(view)
 
-        trackListAdapter = TrackListAdapter() {
-            showMessage(it)
-        }
+        trackListAdapter = TrackListAdapter({showMessage(it)}, {deleteItem(it)})
 
         with(binding) {
             this?.rvTracks?.run {
@@ -89,6 +87,12 @@ class SecondFragment : Fragment(R.layout.fragment_second) {
     private fun updateTracksData() {
         trackListAdapter?.submitList(TrackRepository.tracks)
     }
+
+    private fun deleteItem(itemId: Int) {
+        TrackRepository.removeTrackById(itemId)
+        updateTracksData()
+    }
+
 
     private fun showMessage(trackId: Int) {
         TrackRepository.getTrackById(trackId)?.title?.let {

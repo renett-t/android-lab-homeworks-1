@@ -67,4 +67,8 @@ object TrackRepository {
         track.id = index;
         tracks.add(index - 1, track);   // у меня индексы трэков начинаются с единички :0
     }
+
+    fun removeTrackById(itemId: Int) {
+        tracks.remove(getTrackById(itemId))
+    }
 }

@@ -6,12 +6,14 @@ import androidx.recyclerview.widget.ListAdapter
 import ru.itis.renett.testapp.models.Track
 
 class TrackListAdapter (
-    private val onItemChosenAction: (Int) -> Unit
+    private val onItemChosenAction: (Int) -> Unit,
+    private val onDeleteItemAction: (Int) -> Unit
 ) : ListAdapter<Track, TrackHolder>(TrackDiffUtilItemCallback()) {
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): TrackHolder = TrackHolder.create(parent, onItemChosenAction)
+    ): TrackHolder = TrackHolder.create(parent, onItemChosenAction, onDeleteItemAction)
 
     override fun onBindViewHolder(
         holder: TrackHolder,
