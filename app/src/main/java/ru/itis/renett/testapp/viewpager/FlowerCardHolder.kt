@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.itis.renett.testapp.databinding.ItemFlowerCardBinding
+import ru.itis.renett.testapp.models.FlowerCard
 
 class FlowerCardHolder (
     private val binding: ItemFlowerCardBinding,

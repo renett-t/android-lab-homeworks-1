@@ -1,6 +1,7 @@
 package ru.itis.renett.testapp.viewpager
 
 import ru.itis.renett.testapp.R
+import ru.itis.renett.testapp.models.FlowerCard
 
 object FlowerCardRepository {
     var i = 0;

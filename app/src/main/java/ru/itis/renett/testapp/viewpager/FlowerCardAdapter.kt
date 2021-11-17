@@ -2,6 +2,7 @@ package ru.itis.renett.testapp.viewpager
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import ru.itis.renett.testapp.models.FlowerCard
 
 class FlowerCardAdapter (
     private val list: List<FlowerCard>,

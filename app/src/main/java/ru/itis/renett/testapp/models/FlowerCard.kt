@@ -1,4 +1,4 @@
-package ru.itis.renett.testapp.viewpager
+package ru.itis.renett.testapp.models
 
 data class FlowerCard(
     var id: Int,
