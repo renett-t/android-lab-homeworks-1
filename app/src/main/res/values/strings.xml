@@ -1,3 +1,17 @@
 <resources>
-    <string name="app_name">TestApp</string>
+    <string name="app_name">Dino Alarmer</string>
+    <string name="good_morning_message">Good morning, sun! \n Have a nice day! ^^</string>
+    <string name="active_alarm_title">Active alarm:</string>
+    <string name="set_alarm_title">Set new alarm:</string>
+    <string name="start">Start</string>
+    <string name="stop">Stop</string>
+
+    <string name="action_alarm">action.dino.alarm</string>
+
+    <string name="channel_id">dino_alarmer_channel_id</string>
+    <string name="notification_channel_title">Dino Alarmer Channel</string>
+    <string name="notification_channel_desc">Dino Alarmer Channel Description</string>
+
+    <string name="notification_message_desc">It\'s time to wake up</string>
+    <string name="notification_message_title">DinoAlarmer: Wake up!</string>
 </resources>
