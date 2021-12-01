@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">TestApp</string>
+    <string name="app_name"> Healify </string>
+    <string name="greeting">Hello, sun! Here you can find some beautiful tracks to heal your soul.</string>
 </resources>
