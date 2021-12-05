@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/nav_graph">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/tracksFragment">
 
+    <fragment
+        android:id="@+id/trackFragment"
+        android:name="ru.itis.renett.testapp.fragments.TrackFragment"
+        android:label="TrackFragment"
+        tools:layout="@layout/fragment_track">
+        <action
+            android:id="@+id/action_trackFragment_to_tracksFragment"
+            app:destination="@id/tracksFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/tracksFragment"
+        android:name="ru.itis.renett.testapp.fragments.TracksFragment"
+        android:label="TracksFragment"
+        tools:layout="@layout/fragment_tracks">
+        <action
+            android:id="@+id/action_tracksFragment_to_trackFragment"
+            app:destination="@id/trackFragment" />
+    </fragment>
 </navigation>

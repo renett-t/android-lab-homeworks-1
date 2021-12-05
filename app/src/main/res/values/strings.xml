@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name"> Healify </string>
     <string name="greeting">Hello, sun! Here you can find some beautiful tracks to heal your soul.</string>
+    <string name="pause_play_button">pause/play button</string>
+    <string name="next_button">next button</string>
+    <string name="previous_button">previous button</string>
+    <string name="duration">duration</string>
+    <string name="track_artist_desc">Track Artist(s)</string>
+    <string name="track_title_desc">Track Title</string>
 </resources>

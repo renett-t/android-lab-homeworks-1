@@ -23,4 +23,11 @@ object TrackRepository {
         Track(cursor++, "Цветами радуги", "pyrokinesis", 240, R.drawable.rainbowcolors, R.raw.rainbowcolors),
         Track(cursor++, "Небом и звездой", "Джизус", 281, R.drawable.skyandstar, R.raw.skyandstar),
     )
+
+    fun findTrackById(itemId: Int): Track? {
+        return if (itemId in 0..tracks.size)
+            tracks[itemId]
+        else
+            null
+    }
 }
