@@ -7,7 +7,7 @@ object TrackRepository {
 
     var cursor: Int = 0
 
-    var tracks = arrayListOf<Track>(
+    private val tracks = arrayListOf(
         Track(cursor++, "always, i'll care", "Jeremy Zucker", 147, R.drawable.alwayscare, R.raw.alwayscare),
         Track(cursor++, "Dancing With Your Ghost", "Sasha Alex Sloan", 198, R.drawable.dancingghost, R.raw.dancingghost),
         Track(cursor++, "death bed (coffee for your head)", "Powfu, beabadoobee", 173, R.drawable.deathbed, R.raw.deathbed),
@@ -24,8 +24,12 @@ object TrackRepository {
         Track(cursor++, "Небом и звездой", "Джизус", 281, R.drawable.skyandstar, R.raw.skyandstar),
     )
 
+    fun getTracks(): List<Track> {
+        return tracks;
+    }
+
     fun findTrackById(itemId: Int): Track? {
-        return if (itemId in 0..tracks.size)
+        return if (itemId in tracks.indices)
             tracks[itemId]
         else
             null

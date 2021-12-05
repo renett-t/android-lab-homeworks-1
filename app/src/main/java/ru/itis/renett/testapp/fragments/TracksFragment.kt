@@ -5,6 +5,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.databinding.FragmentTracksBinding
@@ -20,12 +21,13 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentTracksBinding.bind(view)
 
-        trackAdapter = TrackAdapter(TrackRepository.tracks) {
+        trackAdapter = TrackAdapter(TrackRepository.getTracks()) {
             onTrackChosenAction(it)
         }
 
         view.findViewById<RecyclerView>(R.id.rv_tracks).run {
             adapter = trackAdapter
+            addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
         }
     }
 
