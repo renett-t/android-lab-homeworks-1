@@ -5,6 +5,7 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.exception.MusicPlayerException
 import ru.itis.renett.testapp.models.Track
@@ -12,7 +13,6 @@ import ru.itis.renett.testapp.notification.PlayerNotificationManager
 import ru.itis.renett.testapp.repository.TrackRepository
 
 class MusicPlayerService : Service() {
-
     private var mediaPlayer: MediaPlayer = MediaPlayer()
     private lateinit var notificationManager: PlayerNotificationManager
     private lateinit var trackList: List<Track>
@@ -34,6 +34,7 @@ class MusicPlayerService : Service() {
         super.onCreate()
         trackList = TrackRepository.getTracks()
         notificationManager = PlayerNotificationManager(this)
+        Log.e("MUSIC", "INITIALIZATION DONE")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -43,17 +44,18 @@ class MusicPlayerService : Service() {
             this.getString(R.string.resume) -> {
                 if (mediaPlayer.isPlaying) pauseCurrentSong() else playCurrentSong()
             }
+            this.getString(R.string.stop_service) -> stopSelf()
         }
 
-        return super.onStartCommand(intent, flags, startId)
+        return START_REDELIVER_INTENT
     }
 
     private fun pauseCurrentSong() {
-        mediaPlayer.start()
+        mediaPlayer.pause()
     }
 
     private fun playCurrentSong() {
-        mediaPlayer.stop()
+        mediaPlayer.start()
     }
 
     private fun getCurrentTrack(): Track? {
@@ -90,6 +92,8 @@ class MusicPlayerService : Service() {
     }
 
     private fun playTrack(trackId: Int) {
+        Log.e("MUSIC", "PLAY $trackId")
+
         if (mediaPlayer.isPlaying)
             mediaPlayer.stop()
 
@@ -105,10 +109,10 @@ class MusicPlayerService : Service() {
             }
 
             notificationManager.createNotification(trackId)
+//            startForeground(notificationManager.getNotificationId(), notificationManager.createNotification(trackId))
         } else {
             throw MusicPlayerException("Wrong id = $trackId for a track. Cannot play.")
         }
-
     }
 
     private fun isPlaying(): Boolean = mediaPlayer.isPlaying

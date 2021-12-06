@@ -9,9 +9,10 @@
     <string name="track_title_desc">Track Title</string>
     <string name="channel_id">89w3rudboas29</string>
     <string name="notification_channel_title">Playing music</string>
-    <string name="notification_channel_desc">Descriptin</string>
+    <string name="notification_channel_desc">Description</string>
     <string name="previous">previous</string>
     <string name="resume">resume</string>
     <string name="next">next</string>
     <string name="pause">pause</string>
+    <string name="stop_service">stopService</string>
 </resources>

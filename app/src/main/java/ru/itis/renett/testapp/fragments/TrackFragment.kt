@@ -29,17 +29,22 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        binding = FragmentTrackBinding.bind(view)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         requireActivity().bindService(
             Intent(requireContext(), MusicPlayerService::class.java),
             connection,
             BIND_AUTO_CREATE
         )
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentTrackBinding.bind(view)
 
         arguments?.getInt("id")?.let {
+            binder?.playTrack(it)
             initializeView(it)
         }
 
@@ -66,6 +71,7 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
                 tvArtist.text = track.artist
                 tvTitle.text = track.title
             }
+            btnPausePlay.setImageResource(R.drawable.pause)
         }
     }
 
@@ -86,15 +92,15 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
     }
 
     private fun pauseOrPlayTrack() {
-        // ето не работает :(((((((((((((
         if (binder?.isPlaying() == true) {
             binder?.pause()
             binding?.btnPausePlay?.setImageResource(R.drawable.play)
+            showMessage("paused, change image")
         } else {
             binder?.play()
             binding?.btnPausePlay?.setImageResource(R.drawable.pause)
+            showMessage("resumed, change image")
         }
-        showMessage("pause or resume playing track, change image")
     }
 
     private fun showMessage(message: String) {
