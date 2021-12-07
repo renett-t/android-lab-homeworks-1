@@ -33,7 +33,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
 
     private fun onTrackChosenAction(trackId: Int) {
         val bundle = Bundle().apply {
-            putInt("id", trackId)
+            putInt(EXTRA_ID, trackId)
         }
 
         val options = NavOptions.Builder()

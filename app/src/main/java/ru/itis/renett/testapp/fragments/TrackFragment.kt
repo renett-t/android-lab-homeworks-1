@@ -14,6 +14,9 @@ import ru.itis.renett.testapp.databinding.FragmentTrackBinding
 import ru.itis.renett.testapp.media.MusicPlayerService
 import ru.itis.renett.testapp.repository.TrackRepository
 
+const val EXTRA_ID = "id"
+const val EXTRA_PROGRESS = "progress"
+
 class TrackFragment: Fragment(R.layout.fragment_track) {
 
     private var binding: FragmentTrackBinding? = null
@@ -22,6 +25,15 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
            binder = service as? MusicPlayerService.MusicPlayerBinder
+            arguments?.getInt(EXTRA_ID)?.let {
+                val progress = arguments?.getInt(EXTRA_PROGRESS)
+                if (progress != null) {
+                    binder?.playTrackFromPosition(it, progress)
+                } else {
+                    binder?.playTrack(it)
+                }
+                initializeView(it)
+            }
         }
 
         override fun onServiceDisconnected(name: ComponentName?) {
@@ -32,7 +44,7 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requireActivity().bindService(
+        activity?.bindService(
             Intent(requireContext(), MusicPlayerService::class.java),
             connection,
             BIND_AUTO_CREATE
@@ -43,11 +55,10 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentTrackBinding.bind(view)
 
-        arguments?.getInt("id")?.let {
-            binder?.playTrack(it)
-            initializeView(it)
-        }
+        initListeners()
+    }
 
+    private fun initListeners() {
         binding?.run {
             btnNext.setOnClickListener {
                 playNextTrack()
@@ -59,6 +70,9 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
 
             btnPrevious.setOnClickListener {
                 playPreviousSong()
+            }
+            btnStop.setOnClickListener {
+                stopPlayingSong()
             }
         }
     }
@@ -80,7 +94,6 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
         binder?.getCurrentTrack()?.id?.let {
             initializeView(it)
         }
-        showMessage("playing next track")
     }
 
     private fun playPreviousSong() {
@@ -88,19 +101,21 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
         binder?.getCurrentTrack()?.id?.let {
             initializeView(it)
         }
-        showMessage("playing previous track")
     }
 
     private fun pauseOrPlayTrack() {
         if (binder?.isPlaying() == true) {
             binder?.pause()
             binding?.btnPausePlay?.setImageResource(R.drawable.play)
-            showMessage("paused, change image")
         } else {
             binder?.play()
             binding?.btnPausePlay?.setImageResource(R.drawable.pause)
-            showMessage("resumed, change image")
         }
+    }
+
+    private fun stopPlayingSong() {
+        binder?.stop()
+        binding?.btnPausePlay?.setImageResource(R.drawable.play)
     }
 
     private fun showMessage(message: String) {
@@ -114,6 +129,5 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        requireActivity().unbindService(connection)
     }
 }
