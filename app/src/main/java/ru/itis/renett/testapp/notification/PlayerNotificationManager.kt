@@ -1,6 +1,5 @@
 package ru.itis.renett.testapp.notification
 
-import android.app.Notification
 import android.app.NotificationChannel
 import android.content.Context
 import android.app.NotificationManager
@@ -9,12 +8,12 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.MediaPlayer
 import android.os.Build
-import android.os.Bundle
+import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.navigation.NavDeepLinkBuilder
 import ru.itis.renett.testapp.MainActivity
 import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.fragments.EXTRA_ID
+import ru.itis.renett.testapp.fragments.EXTRA_PROGRESS
 import ru.itis.renett.testapp.media.MusicPlayerService
 import ru.itis.renett.testapp.repository.TrackRepository
 
@@ -44,7 +43,7 @@ class PlayerNotificationManager(
         }
     }
 
-     fun createNotification(itemId: Int, player: MediaPlayer): Notification? {
+     fun createNotification(itemId: Int, player: MediaPlayer) {
         val track = TrackRepository.findTrackById(itemId)
 
         track?.let {
@@ -60,23 +59,20 @@ class PlayerNotificationManager(
             val stopIntent = Intent(context, MusicPlayerService::class.java).apply {
                 action = context.getString(R.string.stop)
             }
-            val stopServiceIntent = Intent(context, MusicPlayerService::class.java).apply {
-                action = context.getString(R.string.stop_service)
+            val intentToStartActivity = Intent(context, MainActivity::class.java).apply {
+                putExtra(EXTRA_ID, it.id)
+                putExtra(EXTRA_PROGRESS, player.currentPosition)
             }
 
-            val intentToOpenFragment = NavDeepLinkBuilder(context)
-                .setComponentName(MainActivity::class.java)
-                .setGraph(R.navigation.nav_graph)
-                .setDestination(R.id.trackFragment)
-                .setArguments(Bundle().apply {
-                    putInt(EXTRA_ID, track.id)
-                })
-                .createPendingIntent()
-
+            val pendingIntentToStartActivity = PendingIntent.getActivity(
+                context,
+                7,
+                intentToStartActivity,
+                PendingIntent.FLAG_UPDATE_CURRENT
+            )
             val previousPendingIntent = PendingIntent.getService(context,3, previousIntent,0)
             val nextPendingIntent = PendingIntent.getService(context,2, nextIntent,0)
             val resumePendingIntent = PendingIntent.getService(context,1, resumeIntent,0)
-            val stopServicePendingIntent = PendingIntent.getService(context, 0, stopServiceIntent, 0)
             val stopPendingIntent = PendingIntent.getService(context, 4, stopIntent, 0)
 
             val notification = NotificationCompat.Builder(context, context.getString(R.string.channel_id))
@@ -84,12 +80,12 @@ class PlayerNotificationManager(
                 .setContentTitle(track.title)
                 .setContentText(track.artist)
                 .setLargeIcon(BitmapFactory.decodeResource(context.resources,track.coverId))
-                .setContentIntent(intentToOpenFragment)
+                .setContentIntent(pendingIntentToStartActivity)
+                .setDeleteIntent(stopPendingIntent)
                 .addAction(R.drawable.ic_previous, context.getString(R.string.previous), previousPendingIntent)
                 .addAction(R.drawable.ic_pause, context.getString(R.string.resume), resumePendingIntent)
                 .addAction(R.drawable.ic_next, context.getString(R.string.next), nextPendingIntent)
                 .addAction(R.drawable.ic_stop, context.getString(R.string.stop), stopPendingIntent)
-                .setDeleteIntent(stopServicePendingIntent)
                 .setStyle(androidx.media.app.NotificationCompat.MediaStyle())
                 .setShowWhen(false)
                 .setAutoCancel(false)
@@ -98,9 +94,7 @@ class PlayerNotificationManager(
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .build()
             manager.notify(notificationId, notification)
-            return notification
         }
-         return null
     }
 
     fun getNotificationId(): Int = notificationId

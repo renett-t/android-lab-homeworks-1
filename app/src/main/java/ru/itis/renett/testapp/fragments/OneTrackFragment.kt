@@ -10,16 +10,16 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import ru.itis.renett.testapp.R
-import ru.itis.renett.testapp.databinding.FragmentTrackBinding
+import ru.itis.renett.testapp.databinding.FragmentOneTrackBinding
 import ru.itis.renett.testapp.media.MusicPlayerService
 import ru.itis.renett.testapp.repository.TrackRepository
 
 const val EXTRA_ID = "id"
 const val EXTRA_PROGRESS = "progress"
 
-class TrackFragment: Fragment(R.layout.fragment_track) {
+class OneTrackFragment: Fragment(R.layout.fragment_one_track) {
 
-    private var binding: FragmentTrackBinding? = null
+    private var binding: FragmentOneTrackBinding? = null
     private var binder: MusicPlayerService.MusicPlayerBinder? = null
 
     private val connection = object : ServiceConnection {
@@ -51,9 +51,16 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
         )
     }
 
+    override fun onResume() {
+        super.onResume()
+        binder?.getCurrentTrack()?.id?.let {
+            initializeView(it)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding = FragmentTrackBinding.bind(view)
+        binding = FragmentOneTrackBinding.bind(view)
 
         initListeners()
     }
@@ -124,10 +131,5 @@ class TrackFragment: Fragment(R.layout.fragment_track) {
             message,
             Snackbar.LENGTH_LONG
         ).show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
     }
 }

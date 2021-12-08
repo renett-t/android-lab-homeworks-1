@@ -3,10 +3,7 @@ package ru.itis.renett.testapp.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
 import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.databinding.FragmentTracksBinding
 import ru.itis.renett.testapp.recyclerview.TrackAdapter
@@ -25,7 +22,7 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
             onTrackChosenAction(it)
         }
 
-        view.findViewById<RecyclerView>(R.id.rv_tracks).run {
+        binding?.rvTracks?.run {
             adapter = trackAdapter
             addItemDecoration(DividerItemDecoration(this.context, DividerItemDecoration.VERTICAL))
         }
@@ -35,15 +32,19 @@ class TracksFragment : Fragment(R.layout.fragment_tracks) {
         val bundle = Bundle().apply {
             putInt(EXTRA_ID, trackId)
         }
+        val newFragment = OneTrackFragment()
+        newFragment.arguments = bundle
 
-        val options = NavOptions.Builder()
-            .setLaunchSingleTop(false)
-            .setEnterAnim(R.anim.enter_from_right)
-            .setExitAnim(R.anim.fade_out)
-            .setPopEnterAnim(R.anim.fade_in)
-            .setPopExitAnim(R.anim.exit_to_right)
-            .build()
-        findNavController().navigate(R.id.action_tracksFragment_to_trackFragment, bundle, options)
+        parentFragmentManager.beginTransaction()
+            .setCustomAnimations(
+                R.anim.enter_from_right,
+                R.anim.fade_out,
+                R.anim.fade_in,
+                R.anim.exit_to_right
+            )
+            .replace(R.id.fragment_container, newFragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     override fun onDestroyView() {

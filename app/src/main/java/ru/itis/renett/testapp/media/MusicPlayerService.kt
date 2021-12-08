@@ -4,14 +4,9 @@ import android.app.Service
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Binder
-import android.os.Bundle
 import android.os.IBinder
-import android.util.Log
-import androidx.navigation.NavDeepLinkBuilder
-import ru.itis.renett.testapp.MainActivity
 import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.exception.MusicPlayerException
-import ru.itis.renett.testapp.fragments.EXTRA_ID
 import ru.itis.renett.testapp.models.Track
 import ru.itis.renett.testapp.notification.PlayerNotificationManager
 import ru.itis.renett.testapp.repository.TrackRepository
@@ -58,7 +53,6 @@ class MusicPlayerService : Service() {
                 if (mediaPlayer.isPlaying) pauseCurrentSong() else playCurrentSong()
             }
             this.getString(R.string.stop) -> stopPlayingCurrentSong()
-            this.getString(R.string.stop_service) -> stopSelf()
         }
 
         return START_REDELIVER_INTENT
@@ -74,6 +68,7 @@ class MusicPlayerService : Service() {
 
     private fun stopPlayingCurrentSong() {
         mediaPlayer.stop()
+        mediaPlayer.prepare()
     }
 
     private fun getCurrentTrack(): Track? {
