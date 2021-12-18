@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.databinding.FragmentFirstBinding
 
-class FirstFragment : Fragment(R.layout.fragment_first) {
+class FirstFragment : Fragment(R.layout.fragment_list) {
 
     private var binding: FragmentFirstBinding? = null
 
