@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/pink_lavender"
-    tools:context="fragments.FirstFragment">
+    tools:context="fragments.ListFragment">
 
     <TextView
         android:id="@+id/tv_start"
