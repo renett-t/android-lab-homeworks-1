@@ -9,7 +9,7 @@ object ItemConstants {
     const val EXTRA_DATE = "DATE"
     const val EXTRA_TASK_ID = "TASK_ID"
 
-    public fun getDateFormatted(date: Date?): String {
+    fun getDateFormatted(date: Date?): String {
         return if (date != null) {
             val dateFormat = SimpleDateFormat("EEE, MMM dd, ''yy", Locale.getDefault())
             dateFormat.format(date)

@@ -3,9 +3,11 @@ package ru.itis.renett.testapp.fragments
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.ListFragment
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
+import com.google.android.gms.location.FusedLocationProviderClient
 import ru.itis.renett.testapp.R
-import ru.itis.renett.testapp.database.AppDatabase
+import ru.itis.renett.testapp.database.TaskDatabase
 import ru.itis.renett.testapp.databinding.FragmentTaskBinding
 import ru.itis.renett.testapp.entity.Task
 import ru.itis.renett.testapp.listadapter.ItemConstants.EXTRA_TASK_ID
@@ -13,16 +15,23 @@ import java.util.*
 
 class TaskFragment : Fragment(R.layout.fragment_task) {
     private var binding: FragmentTaskBinding? = null
-    private lateinit var database: AppDatabase
+    private lateinit var database: TaskDatabase
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    private var currentTaskId: Int? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         binding = FragmentTaskBinding.bind(view)
 
-        database = AppDatabase.invoke(context) as AppDatabase
+//        fusedLocationClient = LocationService.detFusedLocationProviderClient(this)
+
+        database = TaskDatabase.getInstance(this.requireContext())
 
         if (arguments?.containsKey(EXTRA_TASK_ID) == true) {
             val task = arguments?.getInt(EXTRA_TASK_ID)?.let {
+                currentTaskId = it
                 database.taskDao().getTaskById(it)
             }
 
@@ -33,6 +42,7 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
                     binder.etTaskDate.setText(taskToDisplay.description)
                 }
             }
+
         }
 
         binding?.apply {
@@ -69,7 +79,8 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
             val latitude = getUserLocationParameter("latitude")
             val longitude = getUserLocationParameter("longitude")
 
-            newTask = Task(null, title, description, date, latitude, longitude)
+            val id: Int = currentTaskId ?: 0
+            newTask = Task(id, title, description, date, latitude, longitude)
         }
 
         return newTask
@@ -80,9 +91,15 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
     }
 
     private fun navigateToPreviousFragment() {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, ListFragment())
-            .commit()
+        val options = NavOptions.Builder()
+            .setLaunchSingleTop(true)
+            .build()
+
+        findNavController().navigate(
+            R.id.action_taskFragment_to_listFragment,
+            null,
+            options
+        )
     }
 
     override fun onDestroyView() {
