@@ -6,4 +6,13 @@
     <string name="notif_delete_all_tasks">Are you sure that you want to delete all task? This cannot be undone</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="no_date">No date</string>
+    <string name="set_date">Set date</string>
+    <string name="location">Location</string>
+    <string name="no_data">No data</string>
+    <string name="save">Save!</string>
+    <string name="your_task">Your task:</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="no_task_saved">\"You don\'t have any task saved\"</string>
 </resources>

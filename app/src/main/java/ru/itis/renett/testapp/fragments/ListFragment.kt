@@ -58,12 +58,14 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     }
 
     private fun updateTaskList(newList: List<Task>) {
-        if (newList.isEmpty()) {
-            binding.tvStart.visibility = View.VISIBLE
-            binding.rvTasks.visibility = View.GONE
-        } else {
-            binding.tvStart.visibility = View.GONE
-            binding.rvTasks.visibility = View.VISIBLE
+        with(binding) {
+            if (newList.isEmpty()) {
+                tvStart.visibility = View.VISIBLE
+                rvTasks.visibility = View.GONE
+            } else {
+                tvStart.visibility = View.GONE
+                rvTasks.visibility = View.VISIBLE
+            }
         }
         taskListAdapter?.submitList(ArrayList(newList))
     }
@@ -95,7 +97,7 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_item_delete) {
             if (database.taskDao().findAllTasks().isEmpty()) {
-                showMessage("You don't have any task saved")
+                showMessage(getString(R.string.no_task_saved))
             } else {
                 AlertDialog.Builder(this.requireContext())
                     .setMessage(R.string.notif_delete_all_tasks)

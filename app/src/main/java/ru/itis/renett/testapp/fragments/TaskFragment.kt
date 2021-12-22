@@ -16,6 +16,7 @@ import ru.itis.renett.testapp.listadapter.ItemConstants.EXTRA_TASK_ID
 import java.util.*
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import android.location.Location
 import android.util.Log
 import com.google.android.gms.location.LocationServices
@@ -31,7 +32,7 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
     private val PERMISSION_REQ_CODE: Int = 222
     private var userLatitude: Double? = null
     private var userLongitude: Double? = null
-
+    private var chosenDate: Date? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -52,29 +53,31 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
             }
 
             task?.let { taskToDisplay ->
-                binding?.also { binder ->
-                    binder.etTaskTitle.setText(taskToDisplay.title)
-                    binder.etTaskDescription.setText(taskToDisplay.description)
-                    binder.etTaskDate.setText(getDateFormatted(taskToDisplay.date ?: Date()))
+                binding?.run {
+                    etTaskTitle.setText(taskToDisplay.title)
+                    etTaskDescription.setText(taskToDisplay.description)
+                    updateDateField(taskToDisplay.date ?: Date())
                 }
             }
 
         }
 
-        binding?.apply {
-            etTaskDate.setOnClickListener {
-                // create date picker
-                // get date
-                // change etTaskDate
+        binding?.run {
+            btnSetDate.setOnClickListener {
+                createDatePickerDialog()
             }
 
             btnSave.setOnClickListener {
-                getTaskFromInput()?.let {
-                        task -> saveTaskToDatabase(task)
+                getTaskFromInput()?.let { task ->
+                    saveTaskToDatabase(task)
+                    navigateToPreviousFragment()
                 }
-                navigateToPreviousFragment()
             }
         }
+    }
+
+    private fun updateDateField(date: Date) {
+        binding?.tvTaskDate?.text = (getDateFormatted(date))
     }
 
     @SuppressLint("MissingPermission")
@@ -122,21 +125,26 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
     }
 
     private fun getDateFromInput(): Date {
-        return Date()
+        return chosenDate ?: Date()
     }
 
     private fun getTaskFromInput(): Task? {
         var newTask: Task? = null
         binding?.apply {
-            val title = etTaskTitle.text.toString()
-            val description = etTaskDescription.text.toString()
-            val date = getDateFromInput()
-            initializeUserLocationParameters()
-            val latitude = userLatitude
-            val longitude = userLongitude
+            if (etTaskTitle.text.toString().isNotEmpty()) {
+                val title = etTaskTitle.text.toString()
+                val description = etTaskDescription.text.toString()
+                val date = getDateFromInput()
+                initializeUserLocationParameters()
+                val latitude = userLatitude
+                val longitude = userLongitude
 
-            val id: Int = currentTaskId ?: 0
-            newTask = Task(id, title, description, date, latitude, longitude)
+                val id: Int = currentTaskId ?: 0
+                newTask = Task(id, title, description, date, latitude, longitude)
+            } else {
+                showMessage("Title cannot be empty")
+                return null
+            }
         }
 
         return newTask
@@ -151,13 +159,26 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
             .setLaunchSingleTop(true)
             .build()
 
-//        findNavController().popBackStack()
+        findNavController().popBackStack()
+    }
 
-        findNavController().navigate(
-            R.id.action_taskFragment_to_listFragment,
-            null,
-            options
-        )
+    private fun createDatePickerDialog() {
+        val calendar = Calendar.getInstance()
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH)
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+        val datePicker = DatePickerDialog(this.requireContext(),
+            DatePickerDialog.OnDateSetListener() {_ , year, monthOfYear, dayOfMonth ->
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.MONTH, monthOfYear)
+                calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                calendar.add(Calendar.MONTH, 1)
+                chosenDate = calendar.time
+                updateDateField(calendar.time)
+        }, year, month, day)
+
+        datePicker.show()
     }
 
     private fun showMessage(message: String) {
