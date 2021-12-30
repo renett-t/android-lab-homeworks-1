@@ -16,6 +16,7 @@ import java.util.*
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
+import androidx.navigation.NavOptions
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.*
@@ -179,7 +180,8 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
     }
 
     private fun navigateToPreviousFragment() {
-        findNavController().popBackStack()
+        findNavController().popBackStack(R.id.listFragment, true)
+        findNavController().navigate(R.id.listFragment)
     }
 
     private fun createDatePickerDialog() {

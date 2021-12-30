@@ -2,12 +2,8 @@ package ru.itis.renett.testapp
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.FragmentManager
+import android.util.Log
 import androidx.navigation.NavController
-import com.google.android.material.snackbar.Snackbar
 import ru.itis.renett.testapp.database.TaskDatabase
 import ru.itis.renett.testapp.databinding.ActivityMainBinding
 import ru.itis.renett.testapp.extentions.findController
@@ -28,5 +24,13 @@ class MainActivity : AppCompatActivity() {
         taskDB = TaskDatabase.getInstance(applicationContext)
 
         navController = findController(R.id.fragment_container)
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        if (navController.currentDestination?.id == R.id.listFragment) {
+            navController.popBackStack(R.id.listFragment, true)
+            navController.navigate(R.id.listFragment)
+        }
     }
 }
