@@ -25,7 +25,6 @@ abstract class TaskDatabase : RoomDatabase() {
         fun getInstance(context: Context): TaskDatabase {
             if (!isInitialized) {
                 instance = Room.databaseBuilder(context, TaskDatabase::class.java, DATABASE_NAME)
-                    .allowMainThreadQueries()
                     .build()
                 isInitialized = true
             }

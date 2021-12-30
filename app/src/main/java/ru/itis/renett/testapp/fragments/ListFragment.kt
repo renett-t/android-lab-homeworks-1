@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
 import ru.itis.renett.testapp.R
 import ru.itis.renett.testapp.database.TaskDatabase
 import ru.itis.renett.testapp.databinding.FragmentListBinding
@@ -21,6 +22,8 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     private lateinit var binding: FragmentListBinding
     private lateinit var database: TaskDatabase
     private var taskListAdapter: TaskListAdapter? = null
+
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -45,16 +48,26 @@ class ListFragment : Fragment(R.layout.fragment_list) {
             }
         }
 
-        val list = database.taskDao().findAllTasks()
+        scope.launch {
+            val list = getListFromDatabase()
 
+            if (list.isEmpty()) {
+                binding.tvStart.visibility = View.VISIBLE
+                binding.rvTasks.visibility = View.GONE
+            } else {
+                updateTaskList(list)
+            }
+        }
+    }
 
-        if (list.isEmpty()) {
-            binding.tvStart.visibility = View.VISIBLE
-            binding.rvTasks.visibility = View.GONE
-        } else {
-            updateTaskList(list)
+    private suspend fun getListFromDatabase(): List<Task> {
+        val listDeferred: Deferred<List<Task>> = scope.async {
+            withContext(Dispatchers.IO) {
+                database.taskDao().findAllTasks()
+            }
         }
 
+        return listDeferred.await()
     }
 
     private fun updateTaskList(newList: List<Task>) {
@@ -89,33 +102,52 @@ class ListFragment : Fragment(R.layout.fragment_list) {
     }
 
     private fun deleteItemById(id: Int) {
-        database.taskDao().deleteTaskById(id)
-        updateTaskList(database.taskDao().findAllTasks())
-        showMessage("Элемент $id был удалён из списка")
+        scope.launch {
+            withContext(Dispatchers.IO) {
+                database.taskDao().deleteTaskById(id)
+            }
+            updateTaskList(getListFromDatabase())
+            showMessage("Элемент $id был удалён из списка")
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.menu_item_delete) {
-            if (database.taskDao().findAllTasks().isEmpty()) {
-                showMessage(getString(R.string.no_task_saved))
-            } else {
-                AlertDialog.Builder(this.requireContext())
-                    .setMessage(R.string.notif_delete_all_tasks)
-                    .setPositiveButton(R.string.yes) {
-                            dialog, _ ->
-                        database.taskDao().deleteAll()
-                        updateTaskList(database.taskDao().findAllTasks())
-                        dialog.dismiss()
-                    }
-                    .setNegativeButton(R.string.no) {
-                            dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .show()
+            scope.launch {
+                if (checkDatabaseEmpty()) {
+                    showMessage(getString(R.string.no_task_saved))
+                } else {
+                    AlertDialog.Builder(requireContext()) // context??
+                        .setMessage(R.string.notif_delete_all_tasks)
+                        .setPositiveButton(R.string.yes) {
+                                dialog, _ ->
+                            scope.launch {
+                                deleteAllTasks()
+                            }
+                            updateTaskList(emptyList())
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton(R.string.no) {
+                                dialog, _ ->
+                            dialog.dismiss()
+                        }
+                        .show()
+                }
             }
         }
 
         return true
+    }
+
+    private suspend fun deleteAllTasks() {
+        withContext(Dispatchers.IO) {
+            database.taskDao().deleteAll()
+        }
+    }
+
+    private suspend fun checkDatabaseEmpty(): Boolean {
+        val list = getListFromDatabase()
+        return list.isEmpty()
     }
 
     private fun showMessage(message: String) {
@@ -124,5 +156,10 @@ class ListFragment : Fragment(R.layout.fragment_list) {
             message,
             Snackbar.LENGTH_SHORT
         ).show()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        scope.cancel()
     }
 }
