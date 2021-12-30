@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import ru.itis.renett.testapp.R
@@ -17,10 +16,9 @@ import java.util.*
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.DatePickerDialog
-import android.location.Location
-import android.util.Log
 import com.google.android.gms.location.LocationServices
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.*
 import ru.itis.renett.testapp.listadapter.ItemConstants.getDateFormatted
 
 class TaskFragment : Fragment(R.layout.fragment_task) {
@@ -28,7 +26,9 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
     private lateinit var database: TaskDatabase
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
-    private var currentTaskId: Int? = null
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    private var currentTaskId: Int = -1
     private val PERMISSION_REQ_CODE: Int = 222
     private var userLatitude: Double? = null
     private var userLongitude: Double? = null
@@ -44,22 +44,13 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
         database = TaskDatabase.getInstance(this.requireContext())
 
         initializeUserLocationParameters()
-        Log.e("LOCATION", "LOCATION INITIALIZED $userLatitude, $userLongitude")
 
         if (arguments?.containsKey(EXTRA_TASK_ID) == true) {
-            val task = arguments?.getInt(EXTRA_TASK_ID)?.let {
-                currentTaskId = it
-                database.taskDao().getTaskById(it)
-            }
-
-            task?.let { taskToDisplay ->
-                binding?.run {
-                    etTaskTitle.setText(taskToDisplay.title)
-                    etTaskDescription.setText(taskToDisplay.description)
-                    updateDateField(taskToDisplay.date ?: Date())
+            scope.launch {
+                arguments?.getInt(EXTRA_TASK_ID)?.let {
+                    initTaskView(it)
                 }
             }
-
         }
 
         binding?.run {
@@ -69,10 +60,35 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
 
             btnSave.setOnClickListener {
                 getTaskFromInput()?.let { task ->
-                    saveTaskToDatabase(task)
-                    navigateToPreviousFragment()
+                    scope.launch {
+                        saveTaskToDatabase(task)
+                        navigateToPreviousFragment()
+                    }
                 }
             }
+        }
+    }
+
+    private suspend fun initTaskView(id: Int) {
+        currentTaskId = id
+        var task : Task? = null
+        withContext(Dispatchers.IO) {
+            task = database.taskDao().getTaskById(currentTaskId)
+        }
+        task?.let { taskToDisplay ->
+            binding?.run {
+                etTaskTitle.setText(taskToDisplay.title)
+                etTaskDescription.setText(taskToDisplay.description)
+                updateDateField(taskToDisplay.date ?: Date())
+                updateLocationFields(taskToDisplay.latitude, taskToDisplay.longitude)
+            }
+        }
+    }
+
+    private fun updateLocationFields(latitude: Double?, longitude: Double?) {
+        binding?.apply {
+            tvLatitude.text = latitude?.toString() ?: "No data"
+            tvLongitude.text = longitude?.toString() ?: "No data"
         }
     }
 
@@ -82,33 +98,36 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
 
     @SuppressLint("MissingPermission")
     private fun initializeUserLocationParameters() {
-        activity?.apply {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                || ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                Log.e("LOCATION", "Location permissions not granted. Requesting.")
-                requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
-                    PERMISSION_REQ_CODE)
-            } else {
-                Log.e("LOCATION", "Location permissions granted. Getting the location.")
-                fusedLocationClient.lastLocation
-                    .addOnSuccessListener { location: Location? ->
-                        userLatitude = location?.latitude
-                        userLongitude = location?.longitude
-                    }
-
-                binding?.apply {
-                    tvLatitude.text = if (userLatitude != null) userLatitude.toString() else "No data"
-                    tvLongitude.text = if (userLongitude != null) userLongitude.toString() else "No data"
+        if (checkPermissionsGranted()) {
+            fusedLocationClient.lastLocation
+                .addOnCompleteListener {
+                    val location = it.result
+                    userLatitude = location?.latitude
+                    userLongitude = location?.longitude
+                    updateLocationFields(userLatitude, userLongitude)
                 }
-
-                Log.e("LOCATION", "LOCATION INITIALIZED $userLatitude, $userLongitude")
-            }
+        } else {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION),
+                PERMISSION_REQ_CODE)
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        Log.e("LOCATION", "Getting the result of check")
+    private fun checkPermissionsGranted(): Boolean {
+        activity?.run {
+            return (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED
+                    && ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED)
+        }
 
+        return false
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when(requestCode) {
             PERMISSION_REQ_CODE -> {
                 if (grantResults.isNotEmpty() &&
@@ -139,7 +158,10 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
                 val latitude = userLatitude
                 val longitude = userLongitude
 
-                val id: Int = currentTaskId ?: 0
+                var id = 0
+                if (currentTaskId > -1)
+                    id = currentTaskId
+
                 newTask = Task(id, title, description, date, latitude, longitude)
             } else {
                 showMessage("Title cannot be empty")
@@ -150,15 +172,13 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
         return newTask
     }
 
-    private fun saveTaskToDatabase(task: Task) {
-        database.taskDao().save(task)
+    private suspend fun saveTaskToDatabase(task: Task) {
+        withContext(Dispatchers.IO) {
+            database.taskDao().save(task)
+        }
     }
 
     private fun navigateToPreviousFragment() {
-        val options = NavOptions.Builder()
-            .setLaunchSingleTop(true)
-            .build()
-
         findNavController().popBackStack()
     }
 
@@ -171,7 +191,7 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
         val datePicker = DatePickerDialog(this.requireContext(),
             DatePickerDialog.OnDateSetListener() {_ , year, monthOfYear, dayOfMonth ->
                 calendar.set(Calendar.YEAR, year)
-                calendar.set(Calendar.MONTH, monthOfYear)
+                calendar.set(Calendar.MONTH, monthOfYear - 1)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                 calendar.add(Calendar.MONTH, 1)
                 chosenDate = calendar.time
@@ -189,8 +209,13 @@ class TaskFragment : Fragment(R.layout.fragment_task) {
         ).show()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        scope.cancel()
     }
 }
