@@ -1,3 +1,18 @@
 <resources>
-    <string name="app_name">TestApp</string>
+    <string name="app_name">To-do</string>
+    <string name="first_task">Start from creating your first task</string>
+    <string name="add_new_task">Add new task</string>
+    <string name="delete_all_tasks">Delete all tasks</string>
+    <string name="notif_delete_all_tasks">Are you sure that you want to delete all task? This cannot be undone</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="no_date">No date</string>
+    <string name="set_date">Set date</string>
+    <string name="location">Location</string>
+    <string name="no_data">No data</string>
+    <string name="save">Save!</string>
+    <string name="your_task">Your task:</string>
+    <string name="title">Title</string>
+    <string name="description">Description</string>
+    <string name="no_task_saved">\"You don\'t have any task saved\"</string>
 </resources>
